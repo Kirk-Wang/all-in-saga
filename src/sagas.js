@@ -79,10 +79,27 @@ function* fetchall() {
   }
 }
 
+function* workerI(action) {
+  const state = yield select();
+  setTimeout(() => {
+    console.log(state);
+  }, 1000);
+}
+
+function watchI(patten, saga) {
+  return fork(function*() {
+    while (true) {
+      const action = yield take(patten);
+      yield fork(saga, action);
+    }
+  });
+}
+
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
   try {
-    yield call(fetchall);
+    yield all([watchI("INCREMENT", workerI)]);
+    // yield call(fetchall);
   } catch (err) {
     console.log(err.message);
   }
