@@ -7,18 +7,12 @@ import {
   select,
   take,
   race,
-  cancelled
+  cancelled,
+  fork,
+  spawn
 } from "redux-saga/effects";
 
 export function* helloSaga() {
-  // const num = yield 1;
-  // console.log(num);
-  // const delay = yield new Promise(resolve => {
-  //   setTimeout(() => {
-  //     resolve("delay 1 s");
-  //   }, 1000);
-  // });
-  // console.log(delay);
   console.log("Hello Saga!");
 }
 
@@ -34,50 +28,63 @@ export function* watchIncrementAsync() {
 function* watchAndLog() {
   yield takeEvery("*", function* logger(action) {
     const state = yield select();
-
-    // console.log("action", action);
-    // console.log("state after", state);
   });
 }
 
-function* play() {
+function* fetchType() {
+  yield call(delay, 1000);
+  throw Error("throw fetchType Error");
+  console.log("fetch Type");
+}
+
+function* fetchUser() {
   try {
-    while (true) {
-      const action = yield take("INCREMENT");
-      const state = yield select();
-      if (state == 5) {
-        break;
-      }
-    }
-    return true;
+    yield call(delay, 2000);
+    console.log("fetch User");
   } catch (err) {
-    throw err;
+    console.log("user err");
+    console.log(err.message);
   } finally {
     if (yield cancelled()) {
-      console.log("You Lost!");
+      console.log("cancel fetchUser");
     }
   }
 }
 
-// 必须在 3 秒内加到 5
-function* game() {
-  while (true) {
-    console.log("Start");
-    console.log("3s……");
-    const { timeout, score } = yield race({
-      timeout: call(delay, 3000),
-      score: call(play)
-    });
-    if (score) {
-      console.log("You Win!");
+function* fetchPost() {
+  try {
+    yield call(delay, 3000);
+    console.log("fetch Post");
+  } catch (err) {
+    console.log("post err");
+    console.log(err.message);
+  } finally {
+    if (yield cancelled()) {
+      console.log("cancel fetchPost");
     }
-    yield put({ type: "RESET" });
-    console.log("after 2 s，Restart");
-    yield call(delay, 2000);
+  }
+}
+
+function* fetchall() {
+  try {
+    const task1 = yield fork(fetchUser);
+    const task2 = yield fork(fetchPost);
+    const task3 = yield fork(fetchType);
+  } catch (err) {
+    console.log(err.message);
+  } finally {
+    if (yield cancelled) {
+      console.log("cancel fetchall");
+    }
   }
 }
 
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
-  yield all([helloSaga(), watchIncrementAsync(), watchAndLog()]);
+  try {
+    yield call(fetchall);
+  } catch (err) {
+    console.log(err.message);
+  }
+  // yield all([helloSaga(), watchIncrementAsync(), watchAndLog()]);
 }
