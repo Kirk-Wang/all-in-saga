@@ -1,16 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { createStore, applyMiddleware } from "redux";
+import createSagaMiddleware from "redux-saga";
 
-import "./styles.css";
+import Counter from "./Counter";
+import reducer from "./reducers";
+import rootSaga, { helloSaga } from "./sagas";
 
-function App() {
-  return (
-    <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-    </div>
+// const sagaMiddleware = createSagaMiddleware();
+// const store = createStore(reducer, applyMiddleware(sagaMiddleware));
+// sagaMiddleware.run(helloSaga);
+
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(reducer, applyMiddleware(sagaMiddleware));
+sagaMiddleware.run(rootSaga);
+
+const action = type => store.dispatch({ type });
+
+function render() {
+  ReactDOM.render(
+    <Counter
+      value={store.getState()}
+      onIncrement={() => action("INCREMENT")}
+      onDecrement={() => action("DECREMENT")}
+      onIncrementAsync={() => action("INCREMENT_ASYNC")}
+    />,
+    document.getElementById("root")
   );
 }
 
-const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
+render();
+store.subscribe(render);
