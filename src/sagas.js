@@ -12,14 +12,15 @@ import {
   spawn
 } from "redux-saga/effects";
 
-import { watchRequests } from "./threads";
+// import { watchRequests } from "./threads";
+import { watchRequests } from "./qsaga";
+import { eventSaga } from "./esaga";
 
 export function* helloSaga() {
   console.log("Hello Saga!");
 }
 
 export function* incrementAsync() {
-  yield put({ type: "REQUEST", payload: Math.random() * 100 });
   yield call(delay, 1000);
   yield put({ type: "INCREMENT" });
 }
@@ -103,7 +104,7 @@ export default function* rootSaga() {
   try {
     // yield all([watchI("INCREMENT", workerI)]);
     // yield call(fetchall);
-    yield all([watchRequests(), watchIncrementAsync()]);
+    yield all([watchRequests(), watchIncrementAsync(), eventSaga()]);
   } catch (err) {
     console.log(err.message);
   }
