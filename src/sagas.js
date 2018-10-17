@@ -12,11 +12,14 @@ import {
   spawn
 } from "redux-saga/effects";
 
+import { watchRequests } from "./threads";
+
 export function* helloSaga() {
   console.log("Hello Saga!");
 }
 
 export function* incrementAsync() {
+  yield put({ type: "REQUEST", payload: Math.random() * 100 });
   yield call(delay, 1000);
   yield put({ type: "INCREMENT" });
 }
@@ -98,8 +101,9 @@ function watchI(patten, saga) {
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
   try {
-    yield all([watchI("INCREMENT", workerI)]);
+    // yield all([watchI("INCREMENT", workerI)]);
     // yield call(fetchall);
+    yield all([watchRequests(), watchIncrementAsync()]);
   } catch (err) {
     console.log(err.message);
   }
