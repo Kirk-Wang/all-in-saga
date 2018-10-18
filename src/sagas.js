@@ -104,7 +104,7 @@ export default function* rootSaga() {
   try {
     // yield all([watchI("INCREMENT", workerI)]);
     // yield call(fetchall);
-    yield all([watchRequests(), watchIncrementAsync(), eventSaga()]);
+    yield all([watchRequests(), watchIncrementAsync()]);
   } catch (err) {
     console.log(err.message);
   }
