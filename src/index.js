@@ -10,10 +10,6 @@ import { domSagaChannel } from "./channel/channel";
 
 import "./styles.css";
 
-// const sagaMiddleware = createSagaMiddleware();
-// const store = createStore(reducer, applyMiddleware(sagaMiddleware));
-// sagaMiddleware.run(helloSaga);
-
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(reducer, applyMiddleware(sagaMiddleware));
 sagaMiddleware.run(rootSaga);
