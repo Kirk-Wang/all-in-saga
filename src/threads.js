@@ -7,6 +7,7 @@ export function* watchRequests() {
 
   // 创建 3 个 worker 'threads'
   for (var i = 0; i < 1; i++) {
+    // 并发监听队列
     yield fork(handleRequest, chan);
   }
 
